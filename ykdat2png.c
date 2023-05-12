@@ -1,6 +1,6 @@
 #define VERSION "1.0.1"
 /*
-  ykgnuplot edit  by yuji katsuta 2023.05.12
+  ykgnuplot edit  by yuji katsuta 2023.05.13
  */
 /**
 * @file ykdat2png
@@ -52,7 +52,7 @@ int main(int argc, char **argv)
 {
   FILE *fw=NULL;
   char gp[GPSU],ctmp[SSU],ustr[USU];
-  int i,x=3,y=4,uflag=0,fflag=0,lflag=1;
+  int i,i0,x=3,y=4,uflag=0,fflag=0,lflag=1;
 	int epsflag=0;
 
 	clock_t oldclock;
@@ -66,12 +66,13 @@ int main(int argc, char **argv)
 	
   if (((verf==0)&&(argc==1))||((verf==1)&&(argc==2))){
     printf(
-      "usage:%s [-e] [-s] [-xNo] [-yNo] [-l]"
+      "usage:%s [-no] [-e] [-s] [-xNo] [-yNo] [-l]"
 			" filename1 [-xNo] [-yNo] [-p] f2 ...\n"
       "      %s [-e] [-s] \'-$(ex1):(ex2)\' [-p] filename1 f2 ...\n"
       "     -xNo : x axis No.,      -yNo : y axis No.            [Ver. %s]\n"
       "     \'-$(ex1):(ex2)\' : ex1 : x axis expression, ex2 : y axis exp.\n"
       "     \'-$(-1*$3):(-$4)\' : x axis -1*(column 3), y axis -(column 4)\n"
+      "     -no : no title\n"
       "     -e : eps output, -s : square, -l : with line, -p : with points\n"
       ,argv[0],argv[0],VERSION);
     return 129;
@@ -80,14 +81,19 @@ int main(int argc, char **argv)
   if (fw == NULL) {
     perror("*** open_failed ***");
     return ERR;
-  }	
-  fprintf(fw,"set title \'ykdat2png  [Ver. %s]\'\n",VERSION);
-  for (i=1;i<argc;i++){
-    if (strncmp(argv[i],"-s",2)==0){
-      fprintf(fw,"set size 0.7,1\n");
+  }
+	if (strncmp(argv[1],"-no",3)==OK) {
+		i0=2;
+	}else{
+		i0=1;
+		fprintf(fw,"set title \'ykdat2png  [Ver. %s]\'\n",VERSION);
+	}
+  for (i=i0;i<argc;i++){
+    if (strncmp(argv[i],"-s",2)==OK){
+      fprintf(fw,"set size square\n");
 			continue;
     }
-    if (strncmp(argv[i],"-e",2)==0){
+    if (strncmp(argv[i],"-e",2)==OK){
       epsflag=1;
     }
 	}
@@ -96,40 +102,40 @@ int main(int argc, char **argv)
 		fprintf(fw,"set output \"ykdat2pngn.eps\"\n");
 		fprintf(fw,"set nokey\n");
 	}else{
-		fprintf(fw,"set term png\n");
+		fprintf(fw,"set term pngcairo\n");
 		fprintf(fw,"set output \"ykdat2pngn.png\"\n");
 		fprintf(fw,"set nokey\n");
 	}
   sprintf(gp,"plot ");
-  for (i=1;i<argc;i++){
-    if (strncmp(argv[i],"-ver",2)==0){
+  for (i=i0;i<argc;i++){
+    if (strncmp(argv[i],"-ver",2)==OK){
       continue;
     }
-    if (strncmp(argv[i],"-e",2)==0){
+    if (strncmp(argv[i],"-e",2)==OK){
       continue;
     }
-    if (strncmp(argv[i],"-s",2)==0){
+    if (strncmp(argv[i],"-s",2)==OK){
       continue;
     }
-    if (strncmp(argv[i],"-l",2)==0){
+    if (strncmp(argv[i],"-l",2)==OK){
       lflag=1;
       continue;
     }
-    if (strncmp(argv[i],"-p",2)==0){
+    if (strncmp(argv[i],"-p",2)==OK){
       lflag=0;
       continue;
     }
-    if (strncmp(argv[i],"-$",2)==0){
+    if (strncmp(argv[i],"-$",2)==OK){
       sscanf(argv[i]+2,"%"MAXS"s",ustr);
       uflag=1;
       continue;
     }
-    if (strncmp(argv[i],"-x",2)==0){
+    if (strncmp(argv[i],"-x",2)==OK){
       sscanf(argv[i]+2,"%d",&x);
       uflag=0;
       continue;
     }
-    if (strncmp(argv[i],"-y",2)==0){
+    if (strncmp(argv[i],"-y",2)==OK){
       sscanf(argv[i]+2,"%d",&y);
       uflag=0;
       continue;
@@ -155,7 +161,7 @@ int main(int argc, char **argv)
 	fprintf(fw,gp,NULL);
 	if (epsflag) {
 		fprintf(fw,"set key\n");
-		fprintf(fw,"set output \"ykgnuplot.eps\"\n");
+		fprintf(fw,"set output \"ykdat2png.eps\"\n");
 		fprintf(fw,"replot\n");
 		fprintf(fw,"set terminal wxt\n");
 		fprintf(fw,"replot\n");
