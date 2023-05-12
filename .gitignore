@@ -1,0 +1,14 @@
+*~
+*/*~
+.vscode
+*.pdf
+*/*.pdf
+*.png
+*/*.png
+*.jpg
+*/*.jpg
+*.elf
+*.o
+*.s
+*.i
+ykdat2png
