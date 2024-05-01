@@ -3,7 +3,7 @@
 ubuntu22.04ja では、  
 sudo apt install build-essential gnuplot  
 make  
-./ykdat2dat bf.dat  
+./ykdat2png bf.dat  
 
 でグラフが表示され、エンターで  
 ykdat2png.png  :key  
